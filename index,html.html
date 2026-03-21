@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campañas WhatsApp · I WORK Centro de Experiencia de AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #07080e;
+  --surface: #0d0e1a;
+  --card:    #111220;
+  --card2:   #161728;
+  --border:  rgba(255,255,255,.07);
+  --border2: rgba(255,255,255,.13);
+  --green:   #25d366;
+  --green2:  #1da851;
+  --accent:  #c084fc;
+  --text:    rgba(255,255,255,.92);
+  --muted:   rgba(255,255,255,.45);
+  --faint:   rgba(255,255,255,.06);
+  --success: #10b981;
+  --warn:    #f59e0b;
+  --danger:  #ef4444;
+  --r: 8px;
+  --r2: 14px;
+  --r3: 20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 0%,rgba(37,211,102,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 100%,rgba(192,132,252,.05) 0%,transparent 55%);
+  pointer-events:none;
+}
+
+/* LAYOUT */
+.app{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:24px 0;
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;
+}
+.sidebar-logo{
+  padding:0 20px 24px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:20px;
+}
+.logo-mark{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:4px;
+}
+.logo-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 10px var(--green);
+  animation:pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.logo-name{
+  font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:700;color:var(--text);
+}
+.logo-sub{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);padding-left:18px;
+}
+.nav-label{
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:0 20px;margin-bottom:6px;
+}
+.nav-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;
+  font-size:13px;font-weight:500;color:var(--muted);
+  background:none;border:none;cursor:pointer;
+  width:100%;text-align:left;
+  transition:all .2s;border-left:2px solid transparent;
+}
+.nav-btn:hover{color:var(--text);background:var(--faint)}
+.nav-btn.active{color:var(--text);background:rgba(37,211,102,.06);border-left-color:var(--green)}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-stats{
+  margin-top:auto;padding:16px 20px;
+  border-top:1px solid var(--border);
+}
+.stat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.stat-row:last-child{margin-bottom:0}
+.stat-lbl{font-size:11px;color:var(--muted)}
+.stat-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);font-weight:500}
+
+/* MAIN */
+.main{flex:1;padding:32px;overflow-y:auto}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.page-header{margin-bottom:28px}
+.page-title{
+  font-family:'Syne',sans-serif;
+  font-size:26px;font-weight:800;color:var(--text);
+  margin-bottom:4px;letter-spacing:-.02em;
+}
+.page-sub{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* CARDS */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:24px;
+  margin-bottom:16px;
+}
+.card-title{
+  font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:700;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title span{font-size:16px}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.app{grid-template-columns:1fr}}
+
+/* METRIC CARDS */
+.metric{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:20px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.metric-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.metric-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--text);line-height:1}
+.metric-sub{font-size:11px}
+
+/* FORM ELEMENTS */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.field label .req{color:var(--danger);margin-left:2px}
+.input,.select,.textarea{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  padding:11px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;color:var(--text);
+  outline:none;width:100%;
+  transition:border-color .2s,background .2s;
+}
+.input::placeholder,.textarea::placeholder{color:rgba(255,255,255,.2)}
+.input:focus,.select:focus,.textarea:focus{
+  border-color:var(--green);
+  background:rgba(37,211,102,.04);
+}
+.select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,.3)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;
+}
+.select option{background:var(--card)}
+.textarea{resize:vertical;min-height:110px;line-height:1.6}
+.field-note{font-size:10px;color:var(--muted);margin-top:-4px}
+
+/* VARIABLES HINT */
+.vars-hint{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;
+}
+.var-chip{
+  font-family:'DM Mono',monospace;
+  font-size:10px;padding:3px 8px;
+  border-radius:4px;background:rgba(37,211,102,.08);
+  border:1px solid rgba(37,211,102,.2);
+  color:var(--green);cursor:pointer;
+  transition:all .15s;
+}
+.var-chip:hover{background:rgba(37,211,102,.18)}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  padding:10px 20px;border-radius:var(--r);
+  border:none;cursor:pointer;transition:all .2s;
+}
+.btn-green{background:var(--green);color:#000}
+.btn-green:hover{background:var(--green2);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.btn-outline:hover{border-color:var(--border2);color:var(--text);background:var(--faint)}
+.btn-danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171}
+.btn-danger:hover{background:rgba(239,68,68,.22)}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-full{width:100%;justify-content:center}
+
+/* PROSPECT TABLE */
+.table-wrap{overflow-x:auto;border-radius:var(--r2)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:1px solid var(--border)}
+thead th{
+  padding:10px 14px;text-align:left;
+  font-family:'DM Mono',monospace;
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:400;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--faint)}
+tbody td{padding:11px 14px;color:var(--text)}
+.td-wa{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:500;padding:3px 9px;
+  border-radius:20px;
+}
+.badge-pending{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.2)}
+.badge-sent{background:rgba(16,185,129,.1);color:var(--success);border:1px solid rgba(16,185,129,.2)}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ACTIONS COL */
+.actions-col{display:flex;gap:6px;align-items:center}
+
+/* IMAGEN PREVIEW */
+.img-drop{
+  border:1.5px dashed rgba(37,211,102,.25);
+  border-radius:var(--r2);
+  padding:32px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .2s;
+  position:relative;
+  overflow:hidden;
+}
+.img-drop:hover{border-color:var(--green);background:rgba(37,211,102,.03)}
+.img-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-drop-icon{font-size:28px;margin-bottom:8px}
+.img-drop-text{font-size:13px;color:var(--muted)}
+.img-drop-sub{font-size:11px;color:rgba(255,255,255,.2);margin-top:4px}
+.img-preview{
+  width:100%;max-height:220px;object-fit:cover;
+  border-radius:var(--r);display:none;margin-bottom:12px;
+}
+
+/* PREVIEW BUBBLE */
+.wa-preview{
+  background:#0b1e12;
+  border:1px solid rgba(37,211,102,.15);
+  border-radius:var(--r2);
+  padding:20px;
+}
+.wa-header{
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);
+  margin-bottom:14px;
+}
+.wa-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:700;color:#000;flex-shrink:0;
+}
+.wa-name{font-size:13px;font-weight:600}
+.wa-status{font-size:10px;color:var(--success)}
+.wa-bubble{
+  background:#1a3a24;
+  border-radius:0 12px 12px 12px;
+  padding:12px 14px;
+  max-width:92%;
+  display:inline-block;
+}
+.wa-img-prev{
+  width:100%;border-radius:8px;
+  margin-bottom:10px;
+  display:none;
+}
+.wa-msg{font-size:13px;line-height:1.65;color:rgba(255,255,255,.88);white-space:pre-wrap;word-break:break-word}
+.wa-time{font-size:10px;color:rgba(255,255,255,.3);margin-top:6px;text-align:right}
+
+/* PROGRESS BAR */
+.campaign-progress{margin-bottom:20px}
+.cp-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.cp-title{font-size:13px;font-weight:500}
+.cp-pct{font-family:'DM Mono',monospace;font-size:12px;color:var(--green)}
+.cp-track{height:4px;background:var(--faint);border-radius:2px;overflow:hidden}
+.cp-fill{height:4px;background:var(--green);border-radius:2px;transition:width .5s ease;box-shadow:0 0 6px rgba(37,211,102,.4)}
+
+/* IMPORT */
+.import-box{
+  border:1.5px dashed var(--border2);
+  border-radius:var(--r2);padding:24px;text-align:center;
+  cursor:pointer;position:relative;transition:all .2s;
+}
+.import-box:hover{border-color:var(--accent);background:rgba(192,132,252,.03)}
+.import-box input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--card2);border:1px solid var(--border2);
+  color:var(--text);font-size:13px;
+  padding:12px 18px;border-radius:var(--r2);
+  opacity:0;transform:translateY(10px);
+  transition:all .3s;z-index:999;
+  pointer-events:none;max-width:300px;
+}
+.toast.show{opacity:1;transform:none}
+.toast.green{border-color:rgba(37,211,102,.4);color:var(--success)}
+.toast.red{border-color:rgba(239,68,68,.4);color:#f87171}
+
+/* EMPTY STATE */
+.empty{
+  text-align:center;padding:48px 24px;
+  color:var(--muted);font-size:13px;
+}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:100;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:var(--r3);padding:28px;
+  max-width:480px;width:90%;
+  animation:fadeIn .25s ease;
+}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.modal-btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:16px}
+.search-wrap input{padding-left:36px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL PROSPECTO -->
+<div class="modal-overlay" id="modalProspect">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Agregar Prospecto</div>
+    <div class="modal-sub">Completa la información del contacto para tu campaña.</div>
+    <input type="hidden" id="editId">
+    <div class="field">
+      <label>Nombre del Contacto <span class="req">*</span></label>
+      <input class="input" id="pNombre" placeholder="Ej: Carlos Rodríguez">
+    </div>
+    <div class="field">
+      <label>Nombre del Negocio <span class="req">*</span></label>
+      <input class="input" id="pNegocio" placeholder="Ej: Restaurante El Rincón">
+    </div>
+    <div class="field">
+      <label>WhatsApp <span class="req">*</span></label>
+      <input class="input" id="pWa" placeholder="573001234567 (con código de país, sin +)">
+      <span class="field-note">Ejemplo Colombia: 573001234567</span>
+    </div>
+    <div class="field">
+      <label>Ciudad</label>
+      <input class="input" id="pCiudad" placeholder="Bogotá">
+    </div>
+    <div class="field">
+      <label>Sector / Industria</label>
+      <input class="input" id="pSector" placeholder="Ej: Restaurantes, Salud, Retail...">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="saveProspect()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GUIA ENVIO -->
+<div class="modal-overlay" id="modalEnvio">
+  <div class="modal" style="max-width:520px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:36px;margin-bottom:8px">💬</div>
+      <div class="modal-title" id="envModalTitle">Enviando mensaje</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px" id="envModalSub"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:var(--r)">
+        <span style="font-family:DM Mono,monospace;font-size:11px;color:var(--green);min-width:18px;font-weight:500">01</span>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">WhatsApp se abrió con el <strong>texto listo</strong> — solo presiona <strong style="color:var(--green)">Enviar ▶</strong>.</div>
+      </div>
+      <div id="paso2img" style="display:none;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.2);border-radius:var(--r)">
+          <span style="font-family:DM Mono,monospace;font-size:11px;color:var(--accent);min-width:18px;font-weight:500">02</span>
+          <div style="font-size:13px;color:var(--text);line-height:1.6">
+            La imagen se <strong style="color:var(--accent)">descargó automáticamente</strong> en tu carpeta Descargas.<br>
+            En WhatsApp: clic en <strong>📎 → elegir archivo</strong> → selecciona <code id="imgFileName" style="font-family:DM Mono,monospace;font-size:11px;color:var(--accent);background:rgba(192,132,252,.1);padding:1px 6px;border-radius:3px">campana.jpg</code>
+          </div>
+        </div>
+        <img id="envImgPreview" style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--r);border:1px solid var(--border);display:none">
+        <button class="btn btn-outline btn-sm btn-full" onclick="reDownloadImg()" style="color:var(--accent);border-color:rgba(192,132,252,.3)">⬇️ Descargar imagen de nuevo</button>
+      </div>
+    </div>
+    <button class="btn btn-green btn-full" onclick="confirmarEnvio()">✅ Listo — mensaje enviado</button>
+    <button class="btn btn-outline btn-sm btn-full" style="margin-top:8px" onclick="cancelarEnvio()">↩️ Cancelar — no lo envié</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-dot"></div>
+        <div class="logo-name">I WORK · AI</div>
+      </div>
+      <div class="logo-sub">Campañas WhatsApp</div>
+    </div>
+
+    <div class="nav-label" style="margin-top:8px">Menú</div>
+    <button class="nav-btn active" onclick="goPage('dashboard')" id="nb-dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </button>
+    <button class="nav-btn" onclick="goPage('prospectos')" id="nb-prospectos">
+      <span class="nav-icon">👥</span> Prospectos
+    </button>
+    <button class="nav-btn" onclick="goPage('campana')" id="nb-campana">
+      <span class="nav-icon">📣</span> Crear Campaña
+    </button>
+    <button class="nav-btn" onclick="goPage('enviar')" id="nb-enviar">
+      <span class="nav-icon">🚀</span> Enviar Mensajes
+    </button>
+
+    <div class="sidebar-stats">
+      <div class="stat-row">
+        <span class="stat-lbl">Prospectos</span>
+        <span class="stat-val" id="sTotal">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-lbl">Enviados</span>
+        <span class="stat-val" id="sSent" style="color:var(--success)">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-lbl">Pendientes</span>
+        <span class="stat-val" id="sPending" style="color:var(--warn)">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Resumen de tu campaña de WhatsApp personalizada.</div>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="metric">
+          <div class="metric-lbl">Total Prospectos</div>
+          <div class="metric-val" id="mTotal">0</div>
+          <div class="metric-sub" style="color:var(--muted)">En base de datos</div>
+        </div>
+        <div class="metric">
+          <div class="metric-lbl">Mensajes Enviados</div>
+          <div class="metric-val" id="mSent" style="color:var(--success)">0</div>
+          <div class="metric-sub" style="color:var(--success)" id="mSentPct">0% completado</div>
+        </div>
+        <div class="metric">
+          <div class="metric-lbl">Pendientes</div>
+          <div class="metric-val" id="mPending" style="color:var(--warn)">0</div>
+          <div class="metric-sub" style="color:var(--muted)">Por enviar</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>📣</span> Campaña activa</div>
+        <div id="dashCampana" style="color:var(--muted);font-size:13px">No hay campaña configurada aún. <button class="btn btn-sm btn-green" style="margin-left:8px" onclick="goPage('campana')">Crear campaña →</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>📈</span> Progreso de envíos</div>
+        <div class="campaign-progress">
+          <div class="cp-header">
+            <span class="cp-title">Avance general</span>
+            <span class="cp-pct" id="dashPct">0%</span>
+          </div>
+          <div class="cp-track"><div class="cp-fill" id="dashBar" style="width:0%"></div></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted)" id="dashTip">Agrega prospectos y configura tu campaña para empezar.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>⚡</span> Acciones rápidas</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-green" onclick="goPage('prospectos')">👥 Ver prospectos</button>
+          <button class="btn btn-outline" onclick="goPage('campana')">📣 Configurar campaña</button>
+          <button class="btn btn-outline" onclick="goPage('enviar')">🚀 Ir a enviar</button>
+          <button class="btn btn-outline btn-sm" onclick="resetAll()" style="color:#f87171;border-color:rgba(239,68,68,.3)">🔄 Resetear enviados</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROSPECTOS -->
+    <div class="page" id="page-prospectos">
+      <div class="page-header">
+        <div class="page-title">Prospectos</div>
+        <div class="page-sub">Gestiona tu base de contactos para las campañas.</div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div class="card-title" style="margin-bottom:0"><span>📥</span> Importar CSV / Agregar</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('csvInput').click()">📂 Importar CSV</button>
+            <input type="file" id="csvInput" accept=".csv" style="display:none" onchange="importCSV(this)">
+            <button class="btn btn-green btn-sm" onclick="openModal()">+ Agregar contacto</button>
+          </div>
+        </div>
+
+        <!-- CSV hint -->
+        <div style="padding:12px 14px;background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.15);border-radius:var(--r);font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+          📋 <strong style="color:var(--text)">Formato CSV:</strong> El archivo debe tener columnas en este orden:<br>
+          <code style="font-family:'DM Mono',monospace;color:var(--accent)">nombre, negocio, whatsapp, ciudad, sector</code><br>
+          La primera fila debe ser el encabezado. WhatsApp con código de país sin +.
+        </div>
+
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="input" id="searchInput" placeholder="Buscar por nombre, negocio o número..." oninput="renderTable()">
+        </div>
+
+        <div class="table-wrap">
+          <table id="prospectsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Negocio</th>
+                <th>WhatsApp</th>
+                <th>Ciudad</th>
+                <th>Sector</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <div class="empty" id="emptyState">
+            <div class="empty-icon">👥</div>
+            Aún no hay prospectos. Agrega uno manualmente o importa un CSV.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMPAÑA -->
+    <div class="page" id="page-campana">
+      <div class="page-header">
+        <div class="page-title">Crear Campaña</div>
+        <div class="page-sub">Configura mensajes personalizados por nicho de negocio — cada sector recibe el mensaje que conecta con su dolor real.</div>
+      </div>
+
+      <!-- NICHOS TABS -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title"><span>🎯</span> Selecciona o crea un nicho</div>
+        <div id="nichoTabs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input class="input" id="newNichoName" placeholder="Ej: Clínicas, Gimnasios, Hoteles..." style="max-width:240px">
+          <button class="btn btn-outline btn-sm" onclick="addNicho()">+ Agregar nicho</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <!-- IMAGEN POR NICHO -->
+          <div class="card">
+            <div class="card-title"><span>🖼️</span> Imagen del nicho — <span id="nichoImgLabel" style="color:var(--accent);font-size:12px">selecciona un nicho</span></div>
+            <img id="imgPreview" class="img-preview">
+            <div class="img-drop" id="imgDrop">
+              <input type="file" accept="image/*" onchange="loadImage(this)">
+              <div class="img-drop-icon">🖼️</div>
+              <div class="img-drop-text">Arrastra o haz clic para subir imagen</div>
+              <div class="img-drop-sub">JPG, PNG · Máx 5MB — específica por nicho</div>
+            </div>
+            <div style="margin-top:10px">
+              <button class="btn btn-outline btn-sm" onclick="removeImg()" id="btnRemoveImg" style="display:none">🗑 Quitar imagen</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><span>⚙️</span> Configuración general</div>
+            <div class="field">
+              <label>Nombre de la campaña</label>
+              <input class="input" id="campNombre" placeholder="Ej: Campaña Marzo 2026">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- MENSAJE POR NICHO -->
+          <div class="card">
+            <div class="card-title"><span>✍️</span> Mensaje para — <span id="nichoMsgLabel" style="color:var(--accent);font-size:12px">selecciona un nicho</span></div>
+            <div id="nichoEmptyHint" style="padding:20px;text-align:center;color:var(--muted);font-size:13px">
+              👆 Selecciona un nicho arriba para editar su mensaje
+            </div>
+            <div id="nichoMsgArea" style="display:none">
+              <div class="field">
+                <label>Mensaje personalizado <span class="req">*</span></label>
+                <textarea class="textarea" id="campMsg" placeholder="Escribe el mensaje para este nicho..." oninput="updatePreview()" style="min-height:180px"></textarea>
+                <span class="field-note">Usa variables para personalizar cada mensaje automáticamente.</span>
+              </div>
+              <div style="margin-bottom:14px">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Variables — clic para insertar:</div>
+                <div class="vars-hint">
+                  <span class="var-chip" onclick="insertVar('{{nombre}}')">{{nombre}}</span>
+                  <span class="var-chip" onclick="insertVar('{{negocio}}')">{{negocio}}</span>
+                  <span class="var-chip" onclick="insertVar('{{ciudad}}')">{{ciudad}}</span>
+                  <span class="var-chip" onclick="insertVar('{{sector}}')">{{sector}}</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-green btn-full" onclick="saveNichoMsg()">💾 Guardar mensaje de este nicho</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteNicho()" title="Eliminar nicho">🗑</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PREVIEW -->
+          <div class="card">
+            <div class="card-title"><span>👁️</span> Vista previa</div>
+            <div class="wa-preview">
+              <div class="wa-header">
+                <div class="wa-avatar">N</div>
+                <div>
+                  <div class="wa-name">Nombre del Prospecto</div>
+                  <div class="wa-status">● en línea</div>
+                </div>
+              </div>
+              <div class="wa-bubble">
+                <img id="waImgPreview" class="wa-img-prev">
+                <div class="wa-msg" id="previewMsg">Selecciona un nicho y escribe el mensaje para ver la vista previa...</div>
+                <div class="wa-time">ahora ✓✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMEN NICHOS -->
+      <div class="card">
+        <div class="card-title"><span>📋</span> Resumen de nichos configurados</div>
+        <div id="nichoResumen"></div>
+      </div>
+    </div>
+
+    <!-- ENVIAR -->
+    <div class="page" id="page-enviar">
+      <div class="page-header">
+        <div class="page-title">Enviar Mensajes</div>
+        <div class="page-sub">Abre WhatsApp Web con el mensaje personalizado listo para cada contacto.</div>
+      </div>
+
+      <div class="card" id="enviarConfig">
+        <div class="card-title"><span>📊</span> Estado de la campaña</div>
+        <div class="campaign-progress">
+          <div class="cp-header">
+            <span class="cp-title" id="envCampNombre">Sin campaña activa</span>
+            <span class="cp-pct" id="envPct">0%</span>
+          </div>
+          <div class="cp-track"><div class="cp-fill" id="envBar" style="width:0%"></div></div>
+        </div>
+        <div class="grid-3" style="margin-top:8px">
+          <div style="font-size:12px;color:var(--muted)">Total: <strong style="color:var(--text)" id="envTotal">0</strong></div>
+          <div style="font-size:12px;color:var(--muted)">Enviados: <strong style="color:var(--success)" id="envSent">0</strong></div>
+          <div style="font-size:12px;color:var(--muted)">Pendientes: <strong style="color:var(--warn)" id="envPending">0</strong></div>
+        </div>
+      </div>
+
+      <!-- INSTRUCCIONES -->
+      <div class="card">
+        <div class="card-title"><span>ℹ️</span> ¿Cómo funciona?</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;font-size:13px;color:var(--muted);align-items:flex-start">
+            <span style="color:var(--green);font-family:'DM Mono',monospace;font-size:11px;min-width:20px;padding-top:1px">01</span>
+            Haz clic en <strong style="color:var(--text)">"💬 Enviar"</strong> — se copia el mensaje personalizado automáticamente y se abre WhatsApp.
+          </div>
+          <div style="display:flex;gap:12px;font-size:13px;color:var(--muted);align-items:flex-start">
+            <span style="color:var(--green);font-family:'DM Mono',monospace;font-size:11px;min-width:20px;padding-top:1px">02</span>
+            En WhatsApp el texto ya está listo — solo presiona <strong style="color:var(--text)">Enviar</strong>. Si hay imagen, haz clic en el clip 📎 y pégala con <strong style="color:var(--text)">Ctrl+V</strong>.
+          </div>
+          <div style="display:flex;gap:12px;font-size:13px;color:var(--muted);align-items:flex-start">
+            <span style="color:var(--green);font-family:'DM Mono',monospace;font-size:11px;min-width:20px;padding-top:1px">03</span>
+            El contacto se marca como <strong style="color:var(--success)">enviado automáticamente</strong> — no necesitas hacer nada extra.
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="imgRefCard" style="display:none">
+        <div class="card-title"><span>🖼️</span> Imagen de campaña — se copia al portapapeles automáticamente</div>
+        <img id="imgRef" style="width:100%;max-height:280px;border-radius:var(--r);object-fit:contain;background:rgba(255,255,255,.03);padding:8px">
+        <div style="font-size:12px;color:var(--muted);margin-top:10px;padding:10px 14px;background:rgba(37,211,102,.05);border:1px solid rgba(37,211,102,.15);border-radius:var(--r);line-height:1.7">
+          💡 <strong style="color:var(--text)">Al hacer clic en Enviar</strong>, la app intenta copiar la imagen automáticamente. En WhatsApp: haz clic en el clip 📎 → pega con <strong style="color:var(--text)">Ctrl+V</strong>.
+        </div>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="downloadImg()">⬇️ Descargar imagen</button>
+      </div>
+
+      <!-- LISTA ENVÍOS -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div class="card-title" style="margin-bottom:0"><span>📋</span> Lista de envíos</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="filterSend('all')" id="fbAll" style="color:var(--text)">Todos</button>
+            <button class="btn btn-outline btn-sm" onclick="filterSend('pending')" id="fbPend">Pendientes</button>
+            <button class="btn btn-outline btn-sm" onclick="filterSend('sent')" id="fbSent">Enviados</button>
+          </div>
+        </div>
+        <div id="sendList"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let prospects = JSON.parse(localStorage.getItem('iw_prospects') || '[]');
+let campana   = JSON.parse(localStorage.getItem('iw_campana')   || 'null');
+let imgData   = localStorage.getItem('iw_img') || null;
+let sendFilter = 'all';
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function save() {
+  localStorage.setItem('iw_prospects', JSON.stringify(prospects));
+  localStorage.setItem('iw_campana', JSON.stringify(campana));
+  if (imgData) localStorage.setItem('iw_img', imgData);
+  else localStorage.removeItem('iw_img');
+  updateStats();
+}
+
+function uid() { return Date.now() + Math.random().toString(36).slice(2,6); }
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function updateStats() {
+  const total   = prospects.length;
+  const sent    = prospects.filter(p => p.sent).length;
+  const pending = total - sent;
+  const pct     = total ? Math.round((sent / total) * 100) : 0;
+
+  ['sTotal','mTotal'].forEach(id => document.getElementById(id).textContent = total);
+  ['sSent','mSent'].forEach(id   => document.getElementById(id).textContent = sent);
+  ['sPending','mPending'].forEach(id => document.getElementById(id).textContent = pending);
+
+  document.getElementById('mSentPct').textContent = pct + '% completado';
+  document.getElementById('dashPct').textContent  = pct + '%';
+  document.getElementById('dashBar').style.width  = pct + '%';
+  document.getElementById('envPct').textContent   = pct + '%';
+  document.getElementById('envBar').style.width   = pct + '%';
+  document.getElementById('envTotal').textContent   = total;
+  document.getElementById('envSent').textContent    = sent;
+  document.getElementById('envPending').textContent = pending;
+
+  if (campana) {
+    document.getElementById('dashCampana').innerHTML =
+      `<strong style="color:var(--text)">${campana.nombre || 'Sin nombre'}</strong> — <span style="color:var(--muted)">${campana.msg ? campana.msg.slice(0,60) + '...' : ''}</span>
+       <button class="btn btn-sm btn-outline" style="margin-left:8px" onclick="goPage('campana')">✏️ Editar</button>`;
+    document.getElementById('envCampNombre').textContent = campana.nombre || 'Campaña activa';
+    document.getElementById('dashTip').textContent = `${sent} de ${total} mensajes enviados.`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('nb-' + id).classList.add('active');
+  if (id === 'prospectos') renderTable();
+  if (id === 'enviar')     renderSendList();
+  if (id === 'campana')    loadCampanaForm();
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════
+//  PROSPECTS CRUD
+// ═══════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById('editId').value    = id || '';
+  document.getElementById('modalTitle').textContent = id ? 'Editar Prospecto' : 'Agregar Prospecto';
+  if (id) {
+    const p = prospects.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pNombre').value  = p.nombre;
+    document.getElementById('pNegocio').value = p.negocio;
+    document.getElementById('pWa').value      = p.wa;
+    document.getElementById('pCiudad').value  = p.ciudad || '';
+    document.getElementById('pSector').value  = p.sector || '';
+  } else {
+    ['pNombre','pNegocio','pWa','pCiudad','pSector'].forEach(f => document.getElementById(f).value = '');
+  }
+  document.getElementById('modalProspect').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalProspect').classList.remove('show');
+}
+
+function saveProspect() {
+  const nombre  = document.getElementById('pNombre').value.trim();
+  const negocio = document.getElementById('pNegocio').value.trim();
+  const wa      = document.getElementById('pWa').value.trim().replace(/\D/g,'');
+  const ciudad  = document.getElementById('pCiudad').value.trim();
+  const sector  = document.getElementById('pSector').value.trim();
+  const editId  = document.getElementById('editId').value;
+
+  if (!nombre || !negocio || !wa) { toast('⚠️ Nombre, negocio y WhatsApp son obligatorios.',''); return; }
+  if (wa.length < 10) { toast('⚠️ Número de WhatsApp inválido.',''); return; }
+
+  if (editId) {
+    const idx = prospects.findIndex(p => p.id === editId);
+    if (idx > -1) prospects[idx] = { ...prospects[idx], nombre, negocio, wa, ciudad, sector };
+    toast('✅ Prospecto actualizado.','green');
+  } else {
+    prospects.push({ id: uid(), nombre, negocio, wa, ciudad, sector, sent: false });
+    toast('✅ Prospecto agregado.','green');
+  }
+  save(); closeModal(); renderTable();
+}
+
+function deleteProspect(id) {
+  if (!confirm('¿Eliminar este prospecto?')) return;
+  prospects = prospects.filter(p => p.id !== id);
+  save(); renderTable(); toast('🗑 Prospecto eliminado.');
+}
+
+function markSent(id, val) {
+  const p = prospects.find(x => x.id === id);
+  if (p) { p.sent = val; save(); renderSendList(); renderTable(); }
+}
+
+function resetAll() {
+  if (!confirm('¿Resetear todos los envíos a pendiente?')) return;
+  prospects.forEach(p => p.sent = false);
+  save(); toast('🔄 Todos los envíos reseteados.'); updateStats();
+}
+
+// ═══════════════════════════════════════════════
+//  TABLE RENDER
+// ═══════════════════════════════════════════════
+function renderTable() {
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const filtered = prospects.filter(p =>
+    p.nombre.toLowerCase().includes(q) ||
+    p.negocio.toLowerCase().includes(q) ||
+    p.wa.includes(q)
+  );
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (!filtered.length) {
+    tbody.innerHTML = ''; empty.style.display = 'block'; return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map((p, i) => `
+    <tr>
+      <td style="color:var(--muted);font-size:11px">${i+1}</td>
+      <td><strong>${p.nombre}</strong></td>
+      <td>${p.negocio}</td>
+      <td class="td-wa">${p.wa}</td>
+      <td style="color:var(--muted)">${p.ciudad || '—'}</td>
+      <td style="color:var(--muted)">${p.sector || '—'}</td>
+      <td>
+        ${p.sent
+          ? '<span class="badge badge-sent"><span class="badge-dot"></span>Enviado</span>'
+          : '<span class="badge badge-pending"><span class="badge-dot"></span>Pendiente</span>'}
+      </td>
+      <td>
+        <div class="actions-col">
+          <button class="btn btn-outline btn-sm" onclick="openModal('${p.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProspect('${p.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  CSV IMPORT
+// ═══════════════════════════════════════════════
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split('\n').filter(l => l.trim());
+    let added = 0;
+    lines.slice(1).forEach(line => {
+      const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g,''));
+      const [nombre, negocio, wa, ciudad, sector] = cols;
+      if (nombre && negocio && wa) {
+        prospects.push({ id: uid(), nombre, negocio, wa: wa.replace(/\D/g,''), ciudad: ciudad||'', sector: sector||'', sent: false });
+        added++;
+      }
+    });
+    save(); renderTable();
+    toast(`✅ ${added} prospectos importados.`, 'green');
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ═══════════════════════════════════════════════
+//  NICHOS
+// ═══════════════════════════════════════════════
+let nichos   = JSON.parse(localStorage.getItem('iw_nichos') || 'null');
+let imgNichos = JSON.parse(localStorage.getItem('iw_imgnich') || '{}'  );
+let activeNicho = null;
+
+// Nichos por defecto con mensajes pre-cargados
+const NICHOS_DEFAULT = [
+  {
+    id: 'restaurantes',
+    nombre: '🍽️ Restaurantes',
+    msg: `Hola {{nombre}} 👋
+
+Sabemos lo exigente que es manejar *{{negocio}}* — mesas llenas, pedidos, personal y redes sociales al mismo tiempo.
+
+En *I WORK Centro de Experiencia de AI* ayudamos a restaurantes a usar Inteligencia Artificial para:
+✅ Automatizar reservas y pedidos
+✅ Responder clientes 24/7 sin contratar más staff
+✅ Generar contenido para redes en minutos
+
+¿Te gustaría saber si tu restaurante está listo para dar ese paso?
+
+Te compartimos un diagnóstico gratuito de 3 minutos 👇
+https://iworkcenter.github.io/diagnostico-AI/`
+  },
+  {
+    id: 'estetica',
+    nombre: '💆 Centros de Estética',
+    msg: `Hola {{nombre}} 👋
+
+Gestionar *{{negocio}}* entre citas, productos, clientes recurrentes y redes sociales es todo un reto.
+
+En *I WORK Centro de Experiencia de AI* trabajamos con centros de estética para:
+✅ Automatizar la agenda y recordatorios de citas
+✅ Fidelizar clientes con seguimiento inteligente
+✅ Crear contenido visual atractivo con IA en minutos
+
+¿Quieres descubrir cómo la IA puede quitarte carga operativa y enfocarte en tus clientes?
+
+Diagnóstico gratuito en 3 minutos 👇
+https://iworkcenter.github.io/diagnostico-AI/`
+  },
+  {
+    id: 'odontologia',
+    nombre: '🦷 Centros Odontológicos',
+    msg: `Hola {{nombre}} 👋
+
+Sabemos que en *{{negocio}}* el tiempo es oro — cada minuto que no estás con un paciente lo estás perdiendo en llamadas, confirmaciones y papeleo.
+
+En *I WORK Centro de Experiencia de AI* ayudamos a clínicas odontológicas a:
+✅ Automatizar confirmación y recordatorio de citas
+✅ Gestionar respuestas a pacientes 24/7
+✅ Reducir las citas no asistidas con IA predictiva
+
+¿Le damos un vistazo a si tu clínica está lista para implementar IA?
+
+Diagnóstico gratuito aquí 👇
+https://iworkcenter.github.io/diagnostico-AI/`
+  },
+  {
+    id: 'comercio',
+    nombre: '🛍️ Comercio / Retail',
+    msg: `Hola {{nombre}} 👋
+
+En *{{negocio}}* cada cliente que entra es una oportunidad — y la IA puede ayudarte a convertir más, sin trabajar más horas.
+
+En *I WORK Centro de Experiencia de AI* apoyamos a negocios de retail con:
+✅ Atención al cliente automatizada por WhatsApp
+✅ Seguimiento postventa inteligente
+✅ Análisis de productos más vendidos con IA
+
+¿Tu negocio está listo para dar el paso a la IA?
+
+Descúbrelo en 3 minutos 👇
+https://iworkcenter.github.io/diagnostico-AI/`
+  },
+  {
+    id: 'salud',
+    nombre: '🏥 Clínicas de Salud',
+    msg: `Hola {{nombre}} 👋
+
+En *{{negocio}}* la experiencia del paciente lo es todo — y la Inteligencia Artificial puede transformarla sin complicar los procesos actuales.
+
+En *I WORK Centro de Experiencia de AI* trabajamos con clínicas para:
+✅ Automatizar agendamiento y recordatorios
+✅ Triaje inicial con IA para optimizar consultas
+✅ Comunicación proactiva con pacientes
+
+¿Quieres explorar si tu clínica está lista para integrar IA?
+
+Diagnóstico gratuito en 3 minutos 👇
+https://iworkcenter.github.io/diagnostico-AI/`
+  },
+  {
+    id: 'educacion',
+    nombre: '🎓 Centros Educativos',
+    msg: `Hola {{nombre}} 👋
+
+*{{negocio}}* tiene un reto enorme: captar nuevos estudiantes, atender padres y mantener la calidad educativa al mismo tiempo.
+
+En *I WORK Centro de Experiencia de AI* ayudamos a instituciones educativas con:
+✅ Chatbots de atención a padres y aspirantes 24/7
+✅ Automatización de matrículas y seguimiento
+✅ Generación de contenido académico con IA
+
+¿Exploramos si tu institución puede adoptar IA ahora?
+
+Diagnóstico gratuito 👇
+https://iworkcenter.github.io/diagnostico-AI/`
+  }
+];
+
+function initNichos() {
+  if (!nichos) {
+    nichos = NICHOS_DEFAULT.map(n => ({...n}));
+    saveNichos();
+  }
+}
+
+function saveNichos() {
+  localStorage.setItem('iw_nichos', JSON.stringify(nichos));
+  localStorage.setItem('iw_imgnich', JSON.stringify(imgNichos));
+}
+
+function loadCampanaForm() {
+  initNichos();
+  if (campana) {
+    document.getElementById('campNombre').value = campana.nombre || '';
+  }
+  renderNichoTabs();
+  renderNichoResumen();
+  // Cargar imagen global si existe
+  if (imgData) {
+    document.getElementById('imgPreview').src = imgData;
+    document.getElementById('imgPreview').style.display = 'block';
+    document.getElementById('waImgPreview').src = imgData;
+    document.getElementById('waImgPreview').style.display = 'block';
+    document.getElementById('btnRemoveImg').style.display = 'inline-flex';
+  }
+}
+
+function renderNichoTabs() {
+  const tabs = document.getElementById('nichoTabs');
+  tabs.innerHTML = nichos.map(n => `
+    <button onclick="selectNicho('${n.id}')" style="
+      padding:8px 14px;border-radius:20px;font-size:12px;font-weight:500;
+      border:1px solid ${activeNicho===n.id ? 'var(--green)' : 'var(--border2)'};
+      background:${activeNicho===n.id ? 'rgba(37,211,102,.1)' : 'transparent'};
+      color:${activeNicho===n.id ? 'var(--green)' : 'var(--muted)'};
+      cursor:pointer;transition:all .2s;
+    ">${n.nombre}${imgNichos[n.id] ? ' 🖼️' : ''}</button>
+  `).join('');
+}
+
+function selectNicho(id) {
+  activeNicho = id;
+  const n = nichos.find(x => x.id === id);
+  if (!n) return;
+
+  document.getElementById('nichoMsgLabel').textContent = n.nombre;
+  document.getElementById('nichoImgLabel').textContent = n.nombre;
+  document.getElementById('nichoEmptyHint').style.display = 'none';
+  document.getElementById('nichoMsgArea').style.display = 'block';
+  document.getElementById('campMsg').value = n.msg || '';
+
+  // Cargar imagen del nicho si tiene
+  const ni = imgNichos[id];
+  if (ni) {
+    document.getElementById('imgPreview').src = ni;
+    document.getElementById('imgPreview').style.display = 'block';
+    document.getElementById('waImgPreview').src = ni;
+    document.getElementById('waImgPreview').style.display = 'block';
+    document.getElementById('btnRemoveImg').style.display = 'inline-flex';
+  } else {
+    document.getElementById('imgPreview').style.display = 'none';
+    document.getElementById('waImgPreview').style.display = 'none';
+    document.getElementById('btnRemoveImg').style.display = 'none';
+  }
+
+  renderNichoTabs();
+  updatePreview();
+}
+
+function saveNichoMsg() {
+  if (!activeNicho) { toast('⚠️ Selecciona un nicho primero.'); return; }
+  const msg = document.getElementById('campMsg').value.trim();
+  if (!msg) { toast('⚠️ El mensaje no puede estar vacío.'); return; }
+  const n = nichos.find(x => x.id === activeNicho);
+  if (n) {
+    n.msg = msg;
+    // guardar también imagen del nicho si hay una cargada
+    const prev = document.getElementById('imgPreview');
+    if (prev.style.display !== 'none' && prev.src) {
+      imgNichos[activeNicho] = prev.src;
+    }
+    saveNichos();
+    renderNichoResumen();
+    renderNichoTabs();
+    toast('✅ Mensaje de ' + n.nombre + ' guardado.', 'green');
+  }
+}
+
+function addNicho() {
+  const inp  = document.getElementById('newNichoName');
+  const name = inp.value.trim();
+  if (!name) { toast('⚠️ Escribe el nombre del nicho.'); return; }
+  const id = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  if (nichos.find(n => n.id === id)) { toast('⚠️ Ese nicho ya existe.'); return; }
+  nichos.push({ id, nombre: name, msg: '' });
+  saveNichos();
+  inp.value = '';
+  renderNichoTabs();
+  renderNichoResumen();
+  selectNicho(id);
+  toast('✅ Nicho "' + name + '" creado.', 'green');
+}
+
+function deleteNicho() {
+  if (!activeNicho) return;
+  const n = nichos.find(x => x.id === activeNicho);
+  if (!confirm('¿Eliminar el nicho "' + (n ? n.nombre : '') + '"?')) return;
+  nichos = nichos.filter(x => x.id !== activeNicho);
+  delete imgNichos[activeNicho];
+  activeNicho = null;
+  saveNichos();
+  document.getElementById('nichoMsgArea').style.display = 'none';
+  document.getElementById('nichoEmptyHint').style.display = 'block';
+  document.getElementById('nichoMsgLabel').textContent = 'selecciona un nicho';
+  document.getElementById('nichoImgLabel').textContent = 'selecciona un nicho';
+  renderNichoTabs();
+  renderNichoResumen();
+  toast('🗑 Nicho eliminado.');
+}
+
+function renderNichoResumen() {
+  const el = document.getElementById('nichoResumen');
+  if (!nichos || !nichos.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🎯</div>No hay nichos configurados.</div>';
+    return;
+  }
+  el.innerHTML = nichos.map(n => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">${n.nombre.split(' ')[0]}</span>
+        <div>
+          <div style="font-size:13px;font-weight:500">${n.nombre.replace(/^\S+\s*/,'')}</div>
+          <div style="font-size:11px;color:var(--muted)">${n.msg ? n.msg.slice(0,60)+'...' : 'Sin mensaje configurado'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${imgNichos[n.id] ? '<span style="font-size:10px;color:var(--accent);background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.2);padding:2px 8px;border-radius:10px">🖼️ Con imagen</span>' : ''}
+        ${n.msg ? '<span style="font-size:10px;color:var(--success);background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);padding:2px 8px;border-radius:10px">✅ Listo</span>' : '<span style="font-size:10px;color:var(--warn);background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);padding:2px 8px;border-radius:10px">⚠️ Sin mensaje</span>'}
+        <button class="btn btn-outline btn-sm" onclick="selectNicho('${n.id}');document.querySelector('.nav-btn[onclick*=campana]').click()">✏️ Editar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveCampana() {
+  const nombre = document.getElementById('campNombre').value.trim();
+  campana = { nombre: nombre || 'Campaña sin nombre' };
+  save();
+  toast('✅ Campaña guardada.', 'green');
+}
+
+function updatePreview() {
+  const msg = document.getElementById('campMsg')?.value || '';
+  const preview = msg
+    .replace(/{{nombre}}/g,  '<Nombre>')
+    .replace(/{{negocio}}/g, '<Negocio>')
+    .replace(/{{ciudad}}/g,  '<Ciudad>')
+    .replace(/{{sector}}/g,  '<Sector>');
+  document.getElementById('previewMsg').textContent = preview || 'Tu mensaje aparecerá aquí...';
+}
+
+function insertVar(v) {
+  const ta = document.getElementById('campMsg');
+  const s  = ta.selectionStart, e = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + v + ta.value.slice(e);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = s + v.length;
+  updatePreview();
+}
+
+// ═══════════════════════════════════════════════
+//  IMAGE
+// ═══════════════════════════════════════════════
+function loadImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { toast('⚠️ Imagen demasiado grande. Máx 5MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    if (activeNicho) {
+      imgNichos[activeNicho] = src;
+      saveNichos();
+      renderNichoTabs();
+    } else {
+      imgData = src;
+      localStorage.setItem('iw_img', src);
+    }
+    document.getElementById('imgPreview').src   = src;
+    document.getElementById('imgPreview').style.display = 'block';
+    document.getElementById('waImgPreview').src = src;
+    document.getElementById('waImgPreview').style.display = 'block';
+    document.getElementById('btnRemoveImg').style.display = 'inline-flex';
+    toast('✅ Imagen cargada' + (activeNicho ? ' para este nicho.' : '.'), 'green');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImg() {
+  if (activeNicho) {
+    delete imgNichos[activeNicho];
+    saveNichos();
+    renderNichoTabs();
+  } else {
+    imgData = null;
+    localStorage.removeItem('iw_img');
+  }
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('waImgPreview').style.display = 'none';
+  document.getElementById('btnRemoveImg').style.display = 'none';
+}
+
+function downloadImg() {
+  if (!imgData) return;
+  const a = document.createElement('a');
+  a.href = imgData; a.download = 'campana-iwork.jpg'; a.click();
+}
+
+// ═══════════════════════════════════════════════
+//  SEND LIST
+// ═══════════════════════════════════════════════
+function filterSend(f) {
+  sendFilter = f;
+  ['all','pending','sent'].forEach(x => {
+    const btn = document.getElementById('fb' + x.charAt(0).toUpperCase() + x.slice(1));
+    if (btn) btn.style.color = x === f ? 'var(--green)' : '';
+    if (btn) btn.style.borderColor = x === f ? 'rgba(37,211,102,.4)' : '';
+  });
+  renderSendList();
+}
+
+function buildMsg(prospect) {
+  // Buscar mensaje del nicho que coincide con el sector del prospecto
+  initNichos();
+  let msg = '';
+  if (prospect.sector && nichos) {
+    const sector = prospect.sector.toLowerCase();
+    const nicho  = nichos.find(n =>
+      sector.includes(n.id) ||
+      n.nombre.toLowerCase().includes(sector) ||
+      sector.includes(n.nombre.toLowerCase().replace(/^[^a-z]*/,'').trim())
+    );
+    if (nicho && nicho.msg) msg = nicho.msg;
+  }
+  // Si no hay match de nicho, usar el primer nicho con mensaje
+  if (!msg && nichos) {
+    const fallback = nichos.find(n => n.msg);
+    if (fallback) msg = fallback.msg;
+  }
+  if (!msg) return 'Hola ' + prospect.nombre + ', te contactamos de I WORK Centro de Experiencia de AI.';
+  return msg
+    .replace(/{{nombre}}/g,  prospect.nombre)
+    .replace(/{{negocio}}/g, prospect.negocio)
+    .replace(/{{ciudad}}/g,  prospect.ciudad || '')
+    .replace(/{{sector}}/g,  prospect.sector || '');
+}
+
+function getNichoImg(prospect) {
+  initNichos();
+  if (!prospect.sector || !nichos) return imgData;
+  const sector = prospect.sector.toLowerCase();
+  const nicho  = nichos.find(n =>
+    sector.includes(n.id) ||
+    n.nombre.toLowerCase().includes(sector) ||
+    sector.includes(n.nombre.toLowerCase().replace(/^[^a-z]*/,'').trim())
+  );
+  if (nicho && imgNichos[nicho.id]) return imgNichos[nicho.id];
+  return imgData; // fallback imagen global
+}
+
+let currentSendId = null;
+
+function openWA(id) {
+  if (!campana || !campana.msg) { toast('⚠️ Configura la campaña primero.'); goPage('campana'); return; }
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  currentSendId = id;
+  const texto = buildMsg(p);
+  const nombre = p.nombre.split(' ')[0];
+
+  // Mostrar modal guía
+  document.getElementById('envModalTitle').textContent = 'Enviando a ' + nombre;
+  document.getElementById('envModalSub').textContent   = p.negocio + ' · ' + p.wa;
+
+  // Si hay imagen — auto-descargar y mostrar paso 2
+  const nichoImg = getNichoImg(p);
+  const fname = 'campana-' + p.nombre.replace(/\s+/g,'-').toLowerCase() + '.jpg';
+  if (nichoImg) {
+    document.getElementById('paso2img').style.display = 'flex';
+    document.getElementById('imgFileName').textContent = fname;
+    const prev = document.getElementById('envImgPreview');
+    prev.src = nichoImg; prev.style.display = 'block';
+    // Auto-descargar imagen del nicho correspondiente
+    autoDownloadImgSrc(nichoImg, fname);
+  } else {
+    document.getElementById('paso2img').style.display = 'none';
+  }
+
+  document.getElementById('modalEnvio').classList.add('show');
+
+  // Abrir WhatsApp inmediatamente
+  window.open('https://wa.me/' + p.wa + '?text=' + encodeURIComponent(texto), '_blank');
+}
+
+function autoDownloadImgSrc(src, fname) {
+  if (!src) return;
+  const a = document.createElement('a');
+  a.href = src;
+  a.download = fname || 'campana-iwork.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function autoDownloadImg(fname) {
+  if (!imgData) return;
+  autoDownloadImgSrc(imgData, fname);
+}
+
+function reDownloadImg() {
+  const p    = currentSendId ? prospects.find(x => x.id === currentSendId) : null;
+  const ni   = p ? getNichoImg(p) : imgData;
+  const fname = p ? 'campana-' + p.nombre.replace(/\s+/g,'-').toLowerCase() + '.jpg' : 'campana-iwork.jpg';
+  autoDownloadImgSrc(ni || imgData, fname);
+  toast('⬇️ Imagen descargada de nuevo.', 'green');
+}
+
+function confirmarEnvio() {
+  if (currentSendId) {
+    const p = prospects.find(x => x.id === currentSendId);
+    if (p) { p.sent = true; save(); renderSendList(); renderTable(); }
+    toast('✅ Marcado como enviado.', 'green');
+  }
+  document.getElementById('modalEnvio').classList.remove('show');
+  currentSendId = null;
+}
+
+function cancelarEnvio() {
+  document.getElementById('modalEnvio').classList.remove('show');
+  currentSendId = null;
+}
+
+function renderSendList() {
+  const list = document.getElementById('sendList');
+  let filtered = prospects;
+  if (sendFilter === 'pending') filtered = prospects.filter(p => !p.sent);
+  if (sendFilter === 'sent')    filtered = prospects.filter(p => p.sent);
+
+  // Imagen ref
+  if (imgData) {
+    document.getElementById('imgRefCard').style.display = 'block';
+    document.getElementById('imgRef').src = imgData;
+  } else {
+    document.getElementById('imgRefCard').style.display = 'none';
+  }
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">${sendFilter === 'sent' ? '✅' : '📋'}</div>${sendFilter === 'sent' ? 'Aún no has marcado ningún mensaje como enviado.' : 'No hay prospectos pendientes. ¡Gran trabajo!'}</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(p => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:160px">
+        <div style="font-size:14px;font-weight:500;margin-bottom:2px">${p.nombre}</div>
+        <div style="font-size:12px;color:var(--muted)">${p.negocio} ${p.ciudad ? '· ' + p.ciudad : ''}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.25);margin-top:2px">${p.wa}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        ${p.sent
+          ? `<span class="badge badge-sent"><span class="badge-dot"></span>Enviado</span>
+             <button class="btn btn-outline btn-sm" onclick="markSent('${p.id}', false)" title="Desmarcar">↩️</button>`
+          : `<button class="btn btn-green btn-sm" onclick="openWA('${p.id}')">💬 Enviar</button>`
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+if (imgData) {
+  document.getElementById('imgPreview').src   = imgData;
+  document.getElementById('imgPreview').style.display = 'block';
+  document.getElementById('waImgPreview').src = imgData;
+  document.getElementById('waImgPreview').style.display = 'block';
+  document.getElementById('btnRemoveImg').style.display = 'inline-flex';
+}
+
+initNichos();
+updateStats();
+renderTable();
+</script>
+</body>
+</html>
